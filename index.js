@@ -76,6 +76,6 @@ const loop = setInterval(function () {
 
 function response (room, msg, sender, isGC, replier, imageDB) {}
 
-fuction onStartCompile () {
+function onStartCompile () {
   clearInterval(loop);
 }
