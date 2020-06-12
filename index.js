@@ -2,7 +2,7 @@
   * Copyright 2020 산하, all rights reserved.
   *
   * 이 소스코드에서 수정이 허가된 부분 이외의 수정은 모두 금지됩니다.
-  * 수정이 허가되는 부분 : 상수 rooms, entrance, walkout, e_msg, w_msg의 정의 부분
+  * 수정이 허가되는 부분 : 상수 rooms, entrance, walkout, showChange, e_msg, w_msg의 정의 부분
   *
   * 이 소스코드의 모든 재배포는 금지됩니다.
   *
@@ -33,6 +33,9 @@ const entrance = true;
 // walkout : 퇴장 감지 후 메시지를 보낼 지, 보내지 않을 지 결정합니다. true일 경우 메시지를 보내고, false일 경우 메시지를 보내지 않습니다.
 const walkout = true;
 
+// showChange : 인원수 변동을 표시할 지, 표시하지 않을 지 결정합니다. true일 경우 표시하고, false일 경우 표시하지 않습니다.
+const showChange = true;
+
 // e_msg : 입장 감지 후 보낼 메시지입니다.
 const e_msg = '환영합니다! 공지 읽어주시면 감사하겠습니다.';
 
@@ -45,20 +48,21 @@ function getRoomInfo (id) {
 }
 
 // enter : 입퇴장을 감지하고 처리하는 함수입니다.
-function enter (e, w) {
+function enter (e, w, s) {
   for (let i in rooms) {
     let inf = getRoomInfo(rooms[i][1]);
     if (rooms[i][2] == 0) {
       rooms[i][2] = inf.headcount;
       return;
     }
+    const change = s ? rooms[i][2] + '->' + inf.headcount + '\n' : '';
     if (inf.headcount > rooms[i][2] && e) {
-      Api.replyRoom(rooms[i][0], e_msg + '\n\n' + rooms[i][2] + '->' + inf.headcount + '\nPowered by Sanha');
+      Api.replyRoom(rooms[i][0], e_msg + '\n\n' + change + 'Powered by Sanha');
       rooms[i][2] = inf.headcount;
       return;
     }
     if (inf.headcount < rooms[i][2] && w) {
-      Api.replyRoom(rooms[i][0], w_msg + '\n\n' + rooms[i][2] + '->' + inf.headcount + '\nPowered by Sanha');
+      Api.replyRoom(rooms[i][0], w_msg + '\n\n' + change + 'Powered by Sanha');
       rooms[i][2] = inf.headcount;
       return;
     }
@@ -67,7 +71,7 @@ function enter (e, w) {
 
 const loop = setInterval(function () {
   try {
-    enter(entrance, walkout);
+    enter(entrance, walkout, showChange);
   }
   catch (err) {
     Log.d(err);
